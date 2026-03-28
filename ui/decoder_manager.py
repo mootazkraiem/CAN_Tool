@@ -8,6 +8,8 @@ from .theme import (
     INPUT_HEIGHT,
     PAGE_MARGIN,
     CARD_MARGIN,
+    THEME_DARK,
+    get_theme_palette,
 )
 
 
@@ -80,6 +82,7 @@ class DecoderManagerWidget(QWidget):
         self.signal_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         mono_font = QFont("Consolas", 10)
+        p = get_theme_palette(THEME_DARK)
         mock_data = [
             ("WheelSpeed", "0", "16", "km/h"),
             ("EngineTorque", "16", "8", "%"),
@@ -92,7 +95,7 @@ class DecoderManagerWidget(QWidget):
             values = [name, start, length, unit]
             for c, value in enumerate(values):
                 item = QTableWidgetItem(value)
-                item.setForeground(QColor("#8fefff") if c == 0 else QColor("#b5c1d2"))
+                item.setForeground(QColor(p["accent_cyan"]) if c == 0 else QColor(p["window_fg"]))
                 if c > 0:
                     item.setFont(mono_font)
                     item.setTextAlignment(Qt.AlignCenter)

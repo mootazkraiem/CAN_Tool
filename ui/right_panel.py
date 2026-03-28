@@ -81,7 +81,7 @@ class DashboardAlertCard(QFrame):
 class HealthMiniCard(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("SurfaceCardAlt")
+        self.setObjectName("HealthCard")
 
         root = QVBoxLayout(self)
         root.setContentsMargins(14, 12, 14, 12)

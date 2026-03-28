@@ -45,6 +45,7 @@ from .theme import (
 class PlaybackMetricCard(QFrame):
     def __init__(self, title: str, value: str, unit: str, accent_key: str, parent=None):
         super().__init__(parent)
+        self.setObjectName("metricCard")
         self.title_text = title
         self.value_text = value
         self.unit_text = unit
@@ -75,11 +76,11 @@ class PlaybackMetricCard(QFrame):
         accent = p["health_cpu"] if self.accent_key == "cpu" else p["health_mem"]
         self.setStyleSheet(
             f"""
-            QFrame {{
+            QFrame#metricCard {{
                 background: {p['card_alt_bg']};
                 border: 1px solid {p['card_border']};
                 border-left: 4px solid {accent};
-                border-radius: 12px;
+                border-radius: 16px;
             }}
             """
         )
@@ -178,14 +179,13 @@ class PlaybackFramesTable(QFrame):
     def apply_theme(self, theme_name: str):
         self._theme_name = theme_name
         p = get_theme_palette(theme_name)
-        self.setStyleSheet(
-            f"QFrame {{ background: {p['card_bg']}; border: 1px solid {p['card_border']}; border-radius: 12px; }}"
-        )
+        self.setStyleSheet("QFrame { background: transparent; border: none; }")
         self.table.setStyleSheet(
             f"""
             QTableWidget {{
-                background: transparent;
-                border: none;
+                background: {p['viewer_table_bg']};
+                border: 1px solid {p['card_border']};
+                border-radius: 12px;
                 color: {p['viewer_table_fg']};
                 font-size: {PLAYBACK_SMALL}px;
                 selection-background-color: {p['table_selection_bg']};
@@ -226,6 +226,7 @@ class LogPlaybackWidget(QWidget):
         root.setSpacing(10)
 
         self.content = QFrame()
+        self.content.setObjectName("PlaybackContent")
         content_layout = QVBoxLayout(self.content)
         content_layout.setContentsMargins(14, 12, 14, 12)
         content_layout.setSpacing(12)
@@ -378,7 +379,7 @@ class LogPlaybackWidget(QWidget):
         p = get_theme_palette(theme_name)
 
         self.content.setStyleSheet(
-            f"QFrame {{ background: {p['card_alt_bg']}; border: 1px solid {p['card_border']}; border-radius: 12px; }}"
+            "QFrame#PlaybackContent { background: transparent; border: none; }"
         )
         self.chart_container.setStyleSheet(
             f"QFrame {{ background: {p['card_bg']}; border: 1px solid {p['card_border']}; border-radius: 12px; }}"

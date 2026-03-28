@@ -1,5 +1,9 @@
 # ui/sidebar.py
 
+from decimal import Decimal
+from pathlib import Path
+import subprocess
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from .theme import (
@@ -28,7 +32,7 @@ class NavButton(QPushButton):
         self.setFixedHeight(SIDEBAR_BUTTON_HEIGHT)
         
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(14, 0, 14, 0)
+        layout.setContentsMargins(11, 0, 14, 0)
         layout.setSpacing(14)
 
         self._icon_lbl = QLabel(icon)
@@ -47,6 +51,24 @@ class NavButton(QPushButton):
         self.setText("")
 
 
+def _repo_version_label() -> str:
+    repo_root = Path(__file__).resolve().parents[1]
+    try:
+        result = subprocess.run(
+            ["git", "rev-list", "--count", "HEAD"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        commit_count = int(result.stdout.strip() or "0")
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        commit_count = 0
+
+    version = Decimal("0.1") * commit_count
+    return f"v{version:.1f}"
+
+
 class SidebarWidget(QFrame):
     page_changed = pyqtSignal(int)
 
@@ -54,6 +76,7 @@ class SidebarWidget(QFrame):
         super().__init__(parent)
         self.setObjectName("Sidebar")
         self.setFixedWidth(SIDEBAR_WIDTH)
+        version_text = _repo_version_label()
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -70,7 +93,7 @@ class SidebarWidget(QFrame):
         brand = QLabel("CAN_BUS_MASTER")
         brand.setObjectName("SidebarBrand")
 
-        sub = QLabel("V2.4.0-STABLE")
+        sub = QLabel(version_text)
         sub.setObjectName("SidebarVersionTag")
 
         logo_layout.addWidget(brand)
@@ -89,7 +112,7 @@ class SidebarWidget(QFrame):
         nav_container = QWidget()
         nav_layout = QVBoxLayout(nav_container)
         nav_layout.setContentsMargins(10, 0, 10, 0)
-        nav_layout.setSpacing(4)
+        nav_layout.setSpacing(2)
 
         for i, (label, icon) in enumerate(NAV_ITEMS):
             btn = NavButton(icon, label)
@@ -102,7 +125,7 @@ class SidebarWidget(QFrame):
         self.btn_group.idClicked.connect(self.page_changed.emit)
 
         # ── Version footer ────────────────────────────
-        version_label = QLabel("v2.0.0")
+        version_label = QLabel(version_text)
         version_label.setAlignment(Qt.AlignCenter)
         version_label.setObjectName("SidebarFooter")
 

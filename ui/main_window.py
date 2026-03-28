@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QSplitter,
     QStackedLayout,
     QStackedWidget,
     QVBoxLayout,
@@ -35,6 +36,7 @@ from .theme import (
     WINDOW_DEFAULT_Y,
     WINDOW_MIN_HEIGHT,
     WINDOW_MIN_WIDTH,
+    get_theme_palette,
 )
 from .topbar import TopBarWidget
 from .visualization import VisualizationWidget
@@ -135,13 +137,20 @@ class MainWindow(QMainWindow):
 
         self.can_table = CanTableWidget()
         self.can_table.add_mock_data()
-        self.can_table.setMinimumHeight(460)
+        self.can_table.setMinimumHeight(420)
 
         self.viz = VisualizationWidget()
-        self.viz.setMinimumHeight(340)
+        self.viz.setMinimumHeight(300)
 
-        ws_layout.addWidget(self.can_table, 6)
-        ws_layout.addWidget(self.viz, 4)
+        dashboard_split = QSplitter(Qt.Vertical)
+        dashboard_split.setChildrenCollapsible(False)
+        dashboard_split.addWidget(self.can_table)
+        dashboard_split.addWidget(self.viz)
+        dashboard_split.setStretchFactor(0, 7)
+        dashboard_split.setStretchFactor(1, 3)
+        dashboard_split.setSizes([520, 320])
+
+        ws_layout.addWidget(dashboard_split, 1)
 
         self.right_panel = RightPanelWidget()
 
@@ -150,6 +159,7 @@ class MainWindow(QMainWindow):
         return page
 
     def _build_placeholder(self, name: str) -> QWidget:
+        p = get_theme_palette(self.current_theme)
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setAlignment(Qt.AlignCenter)
@@ -157,17 +167,17 @@ class MainWindow(QMainWindow):
 
         icon = QLabel("[]")
         icon.setAlignment(Qt.AlignCenter)
-        icon.setStyleSheet(f"font-size: {PLACEHOLDER_ICON_SIZE}px; color: #2d3340;")
+        icon.setStyleSheet(f"font-size: {PLACEHOLDER_ICON_SIZE}px; color: {p['muted_label']};")
 
         title = QLabel(name)
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet(
-            f"font-size: {PLACEHOLDER_TITLE_SIZE}px; font-weight: 700; color: #eef4fb; letter-spacing: 1px;"
+            f"font-size: {PLACEHOLDER_TITLE_SIZE}px; font-weight: 700; color: {p['window_fg']}; letter-spacing: 1px;"
         )
 
         sub = QLabel("This section is under construction.")
         sub.setAlignment(Qt.AlignCenter)
-        sub.setStyleSheet(f"font-size: {PLACEHOLDER_SUBTITLE_SIZE}px; color: #7a8598;")
+        sub.setStyleSheet(f"font-size: {PLACEHOLDER_SUBTITLE_SIZE}px; color: {p['muted_label']};")
 
         layout.addWidget(icon)
         layout.addWidget(title)

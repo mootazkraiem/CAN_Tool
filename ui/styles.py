@@ -110,7 +110,7 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     }}
 
     QLabel#SidebarBrand {{
-        color: {p["sidebar_brand"]};
+        color: {p["topbar_title"]};
         font-family: '{FONT_FAMILY_MONO}', monospace;
         font-size: {FONT_SIZE_XL}px;
         font-weight: 800;
@@ -135,10 +135,10 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     }}
 
     QPushButton#SidebarBtn {{
-        background-color: transparent;
+        background-color: {p.get("sidebar_btn_bg", p["sidebar_bg"])};
         text-align: left;
-        border-radius: 12px;
-        border: 1px solid transparent;
+        border-radius: 10px;
+        border: none;
         min-height: {SIDEBAR_BUTTON_HEIGHT}px;
     }}
     QPushButton#SidebarBtn QLabel {{
@@ -148,17 +148,15 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     }}
     QPushButton#SidebarBtn:hover {{
         background-color: {p["sidebar_btn_hover_bg"]};
-        border: 1px solid {p["sidebar_btn_hover_border"]};
+        border: none;
     }}
     QPushButton#SidebarBtn:hover QLabel {{
         color: {p["sidebar_btn_hover_fg"]};
     }}
     QPushButton#SidebarBtn:checked {{
         background-color: {p["sidebar_btn_checked_bg"]};
-        border-left: 4px solid {p["accent_primary"]};
-        border-top: 1px solid {p["sidebar_btn_checked_border"]};
-        border-right: 1px solid {p["sidebar_btn_checked_border"]};
-        border-bottom: 1px solid {p["sidebar_btn_checked_border"]};
+        border: 1px solid {p["sidebar_btn_checked_border"]};
+        border-left: 3px solid {p["accent_primary"]};
     }}
     QPushButton#SidebarBtn:checked QLabel {{
         color: {p["sidebar_btn_checked_fg"]};
@@ -184,21 +182,23 @@ def get_stylesheet(theme_name="Carbon Cyan"):
         border: none;
         font-size: {FONT_SIZE_LARGE}px;
         font-weight: 600;
-        min-height: {TAB_HEIGHT}px;
-        padding: 8px 12px 10px 12px;
+        min-height: {max(28, TAB_HEIGHT - 6)}px;
+        padding: 5px 12px;
+        border-radius: 8px;
     }}
     QPushButton#BtnTopBarTab:hover {{
+        background: #232323;
         color: {p["tab_hover_fg"]};
     }}
     QPushButton#BtnTopBarTabActive {{
-        background: transparent;
+        background: {p["card_bg"]};
         color: {p["tab_active_fg"]};
-        border: none;
-        border-bottom: 2px solid {p["tab_active_fg"]};
+        border: 1px solid {p.get("strong_border", p["card_border"])};
+        border-radius: 8px;
         font-size: {FONT_SIZE_LARGE}px;
         font-weight: 700;
-        min-height: {TAB_HEIGHT}px;
-        padding: 8px 12px 10px 12px;
+        min-height: {max(28, TAB_HEIGHT - 6)}px;
+        padding: 5px 12px;
     }}
 
     QFrame#TopStatusLive, QFrame#TopStatusOffline {{
@@ -257,7 +257,7 @@ def get_stylesheet(theme_name="Carbon Cyan"):
         min-height: {INPUT_HEIGHT}px;
         font-size: {FONT_SIZE_LARGE}px;
         selection-background-color: {p["accent_primary"]};
-        selection-color: {"#ffffff" if p["is_light"] else "#071014"};
+        selection-color: {p["window_fg"]};
     }}
     QLineEdit:focus, QComboBox:focus, QPlainTextEdit:focus, QTextEdit:focus {{
         border: 1px solid {p["input_focus_border"]};
@@ -285,13 +285,13 @@ def get_stylesheet(theme_name="Carbon Cyan"):
         outline: none;
     }}
 
-    QTableWidget, QListWidget, QTreeWidget {{
+    QTableWidget, QListWidget, QTreeWidget, QPlainTextEdit, QTextEdit {{
         background-color: {p["table_bg"]};
         color: {p["table_fg"]};
         alternate-background-color: {p["table_alt_bg"]};
         gridline-color: transparent;
         border: 1px solid {p["table_border"]};
-        border-radius: {RADIUS_LARGE}px;
+        border-radius: 12px;
         selection-background-color: {p["table_selection_bg"]};
         selection-color: {p["table_selection_fg"]};
         outline: none;
@@ -311,7 +311,7 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     QHeaderView::section {{
         background-color: {p["header_bg"]};
         color: {p["header_fg"]};
-        padding: 12px 12px;
+        padding: 10px;
         border: none;
         border-bottom: 1px solid {p["header_border"]};
         font-size: {FONT_SIZE_CAPTION}px;
@@ -325,6 +325,16 @@ def get_stylesheet(theme_name="Carbon Cyan"):
         border-left: 1px solid {p["right_panel_border"]};
     }}
 
+    QFrame#metricCard {{
+        background-color: {p["card_bg"]};
+        border: 1px solid {p["card_border"]};
+        border-radius: 12px;
+    }}
+    QFrame#metricCard:hover {{
+        background-color: {p["card_hover"] if "card_hover" in p else p["dropdown_selection_bg"]};
+        border: 1px solid {p["accent_primary"]};
+    }}
+
     QFrame#AlertCard,
     QFrame#AlertCard_Info,
     QFrame#AlertCard_Warning,
@@ -333,10 +343,18 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     QFrame#SurfaceCardAlt {{
         background-color: {p["card_bg"]};
         border: 1px solid {p["card_border"]};
-        border-radius: {RADIUS_LARGE}px;
+        border-radius: 12px;
     }}
     QFrame#SurfaceCardAlt {{
         background-color: {p["card_alt_bg"]};
+    }}
+    QFrame#SurfaceCard:hover,
+    QFrame#SurfaceCardAlt:hover,
+    QFrame#AlertCard:hover,
+    QFrame#AlertCard_Info:hover,
+    QFrame#AlertCard_Warning:hover,
+    QFrame#AlertCard_Critical:hover {{
+        background-color: {p["card_hover"] if "card_hover" in p else p["dropdown_selection_bg"]};
     }}
     QFrame#AlertCard_Info {{
         border-top: 1px solid {p["alert_info_border"]};
@@ -346,6 +364,12 @@ def get_stylesheet(theme_name="Carbon Cyan"):
     }}
     QFrame#AlertCard_Critical {{
         border-top: 1px solid {p["alert_critical_border"]};
+    }}
+
+    QFrame#HealthCard {{
+        background-color: {p["card_bg"]};
+        border: 1px solid {p.get("strong_border", p["card_border"])};
+        border-radius: 14px;
     }}
 
     QLabel#AlertTitle {{

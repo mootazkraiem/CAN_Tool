@@ -86,11 +86,12 @@ class VisualizationWidget(QWidget):
 
             root.addWidget(self.graph)
         else:
+            p = get_theme_palette(self._theme_name)
             fallback = QLabel("Install 'pyqtgraph' to enable data visualization")
             fallback.setAlignment(Qt.AlignCenter)
             fallback.setStyleSheet(
-                f"color: #ffb45c; font-style: italic; font-size: {FONT_SIZE_LARGE}px;"
-                "border: 1px dashed #5a4521; border-radius: 14px; padding: 24px;"
+                f"color: {p['badge_warning_fg']}; font-style: italic; font-size: {FONT_SIZE_LARGE}px;"
+                f"background: {p['card_bg']}; border: 1px dashed {p['card_border']}; border-radius: 14px; padding: 24px;"
             )
             root.addWidget(fallback)
 
@@ -158,4 +159,4 @@ class VisualizationWidget(QWidget):
                 antialias=True,
             )
             self.graph.plot(self._x, self._y2, pen=pg.mkPen(color=p["viz_line2"], width=2), antialias=True)
-            self.graph.setStyleSheet(f"border: 1px solid {p['viz_graph_border']}; border-radius: 14px;")
+            self.graph.setStyleSheet(f"border: 1px solid {p['viz_graph_border']}; border-radius: 12px;")
