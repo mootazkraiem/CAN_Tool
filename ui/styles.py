@@ -372,13 +372,30 @@ def get_stylesheet(theme_name="Carbon Cyan"):
         border-radius: 14px;
     }}
 
+    QFrame#ChatBubbleUser, QFrame#ChatBubbleAI {{
+        border-radius: 14px;
+        border: 1px solid {p.get("strong_border", p["card_border"])};
+    }}
+    QFrame#ChatBubbleUser {{
+        background-color: {p["card_hover"]};
+        border-color: {p["accent_primary"]};
+    }}
+    QFrame#ChatBubbleAI {{
+        background-color: {p["card_bg"]};
+    }}
+    QFrame#ChatBubbleUser QLabel, QFrame#ChatBubbleAI QLabel {{
+        background: transparent;
+        font-size: {FONT_SIZE_SMALL}px;
+        color: {p["window_fg"]};
+    }}
+
     QLabel#AlertTitle {{
-        font-size: {FONT_SIZE_LARGE}px;
+        font-size: {FONT_SIZE_SMALL}px;
         font-weight: 700;
         color: {p["alert_title"]};
     }}
     QLabel#AlertDesc {{
-        font-size: {FONT_SIZE_SMALL}px;
+        font-size: {FONT_SIZE_MICRO}px;
         color: {p["alert_desc"]};
         line-height: 1.45;
     }}

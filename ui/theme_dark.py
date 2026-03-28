@@ -130,7 +130,7 @@ DARK_THEME_PALETTE = {
     "viz_combo_popup_border": "#3A3A3A",
     "viz_combo_popup_selection": "#303030",
     "viz_combo_arrow": "#B4B4B4",
-    "viz_graph_bg": "#2A2A2A",
+    "viz_graph_bg": "transparent",
     "viz_axis_fg": "#8A8A8A",
     "viz_line1": "#19C6FF",
     "viz_fill1": "25, 198, 255, 18",

@@ -4,24 +4,22 @@ from decimal import Decimal
 from pathlib import Path
 import subprocess
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from .theme import (
-    SIDEBAR_BUTTON_HEIGHT,
-    SIDEBAR_ICON_WIDTH,
-    SIDEBAR_LOGO_HEIGHT,
-    SIDEBAR_WIDTH,
-)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-# Nav item: (label, icon_char)
+from .theme import SIDEBAR_BUTTON_HEIGHT, SIDEBAR_ICON_WIDTH, SIDEBAR_LOGO_HEIGHT, SIDEBAR_WIDTH
+
+
 NAV_ITEMS = [
-    ("Dashboard",        "⊞"),
-    ("Log Playback",     "▶"),
-    ("Decoder Manager",  "⚙"),
-    ("AI Alerts",        "⚡"),
-    ("Analytics",        "◈"),
-    ("Settings",         "≡"),
+    ("Dashboard", "D"),
+    ("Log Playback", "P"),
+    ("Decoder Manager", "M"),
+    ("AI Alerts", "A"),
+    ("Analytics", "N"),
+    ("AI Chat", "C"),
+    ("Settings", "S"),
 ]
+
 
 class NavButton(QPushButton):
     def __init__(self, icon: str, label: str, parent=None):
@@ -30,7 +28,7 @@ class NavButton(QPushButton):
         self.setCheckable(True)
         self.setCursor(Qt.PointingHandCursor)
         self.setFixedHeight(SIDEBAR_BUTTON_HEIGHT)
-        
+
         layout = QHBoxLayout(self)
         layout.setContentsMargins(11, 0, 14, 0)
         layout.setSpacing(14)
@@ -82,7 +80,6 @@ class SidebarWidget(QFrame):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
 
-        # ── Logo area ────────────────────────────────
         logo_frame = QFrame()
         logo_frame.setFixedHeight(SIDEBAR_LOGO_HEIGHT)
         logo_layout = QVBoxLayout(logo_frame)
@@ -99,12 +96,10 @@ class SidebarWidget(QFrame):
         logo_layout.addWidget(brand)
         logo_layout.addWidget(sub)
 
-        # ── Nav section label ─────────────────────────
         nav_label = QLabel("NAVIGATION")
         nav_label.setObjectName("SectionTitle")
         nav_label.setContentsMargins(14, 20, 0, 8)
 
-        # ── Buttons ──────────────────────────────────
         self.btn_group = QButtonGroup(self)
         self.btn_group.setExclusive(True)
         self.buttons = []
@@ -124,7 +119,6 @@ class SidebarWidget(QFrame):
 
         self.btn_group.idClicked.connect(self.page_changed.emit)
 
-        # ── Version footer ────────────────────────────
         version_label = QLabel(version_text)
         version_label.setAlignment(Qt.AlignCenter)
         version_label.setObjectName("SidebarFooter")

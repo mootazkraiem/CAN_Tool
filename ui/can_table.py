@@ -1,46 +1,40 @@
+from __future__ import annotations
+
+from typing import List
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import (
     QAbstractItemView,
+    QComboBox,
     QFrame,
-    QGraphicsDropShadowEffect,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
 
-from .theme import (
-    CAN_COL_DATA,
-    CAN_COL_DLC,
-    CAN_COL_ID,
-    CAN_COL_SIGNAL,
-    CAN_COL_TIMESTAMP,
-    CAN_TABLE_ROW_HEIGHT,
-    FONT_FAMILY_MONO,
-    FONT_SIZE_CAPTION,
-    FONT_SIZE_SMALL,
-    THEME_DARK,
-    get_theme_palette,
-)
+from core.decoder import DecodedSignal
+from .theme import FONT_FAMILY_MONO, FONT_SIZE_CAPTION, FONT_SIZE_SMALL, THEME_DARK, get_theme_palette
 
 
 class CanTableWidget(QWidget):
+    MAX_ROWS = 1000
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self._theme_name = THEME_DARK
+        self._signals: List[DecodedSignal] = []
+        self._build_ui()
+        self.apply_theme(self._theme_name)
 
+    def _build_ui(self):
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(0)
-
-        viewer_card = QFrame()
-        viewer_card.setObjectName("SurfaceCard")
-        viewer_layout = QVBoxLayout(viewer_card)
-        viewer_layout.setContentsMargins(0, 0, 0, 0)
-        viewer_layout.setSpacing(0)
+        root.setSpacing(12)
 
         self.filter_bar = QFrame()
         self.filter_bar.setObjectName("SurfaceCardAlt")
@@ -48,14 +42,22 @@ class CanTableWidget(QWidget):
         filter_layout.setContentsMargins(14, 10, 14, 10)
         filter_layout.setSpacing(10)
 
-        self.filter_id = QLabel("ID: 0x1A2  x")
-        self.filter_signal = QLabel("Signal: Battery_Voltage  x")
-        self.filter_add = QLabel("+ ADD_FILTER")
+        self.filter_id = QLineEdit()
+        self.filter_id.setPlaceholderText("Filter CAN ID")
+        self.filter_signal = QLineEdit()
+        self.filter_signal.setPlaceholderText("Filter signal name")
+        self.filter_severity = QComboBox()
+        self.filter_severity.addItems(["All severities", "normal", "warning", "critical"])
 
-        filter_layout.addWidget(self.filter_id)
-        filter_layout.addWidget(self.filter_signal)
-        filter_layout.addWidget(self.filter_add)
-        filter_layout.addStretch()
+        filter_layout.addWidget(self.filter_id, 1)
+        filter_layout.addWidget(self.filter_signal, 1)
+        filter_layout.addWidget(self.filter_severity)
+
+        viewer_card = QFrame()
+        viewer_card.setObjectName("SurfaceCard")
+        viewer_layout = QVBoxLayout(viewer_card)
+        viewer_layout.setContentsMargins(0, 0, 0, 0)
+        viewer_layout.setSpacing(0)
 
         self.header = QFrame()
         header_layout = QHBoxLayout(self.header)
@@ -63,109 +65,51 @@ class CanTableWidget(QWidget):
         header_layout.setSpacing(12)
 
         self.title = QLabel("CAN_FRAME_VIEWER")
-        self.stats = QLabel("PACKETS_S: 1,402  |  ERR_RATE: 0.002%")
-
+        self.stats = QLabel("Signals: 0  |  Filters: none")
         header_layout.addWidget(self.title)
         header_layout.addStretch()
         header_layout.addWidget(self.stats)
 
-        self.table = QTableWidget()
-        self.table.setMinimumHeight(360)
-        self.table.setColumnCount(6)
-        self.table.setHorizontalHeaderLabels(
-            ["TIMESTAMP", "ID", "DLC", "DATA PAYLOAD (HEX)", "DECODED SIGNAL", "VALUE"]
-        )
-        self.table.setAlternatingRowColors(False)
+        self.table = QTableWidget(0, 6)
+        self.table.setHorizontalHeaderLabels(["Timestamp", "CAN ID", "Signal", "Value", "Unit", "Severity"])
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setHighlightSections(False)
+        self.table.setShowGrid(False)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.table.setShowGrid(False)
+        self.table.setAlternatingRowColors(False)
         self.table.setFocusPolicy(Qt.NoFocus)
-        self.table.verticalHeader().setVisible(False)
-        self.table.horizontalHeader().setHighlightSections(False)
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(18)
-        shadow.setColor(QColor(0, 0, 0, 70))
-        shadow.setOffset(0, 4)
-        viewer_card.setGraphicsEffect(shadow)
-
-        self.table.setColumnWidth(0, CAN_COL_TIMESTAMP)
-        self.table.setColumnWidth(1, CAN_COL_ID)
-        self.table.setColumnWidth(2, CAN_COL_DLC)
-        self.table.setColumnWidth(3, CAN_COL_DATA + 70)
-        self.table.setColumnWidth(4, CAN_COL_SIGNAL + 40)
+        self.table.setMinimumHeight(380)
+        self.table.setColumnWidth(2, 300)
 
         viewer_layout.addWidget(self.header)
         viewer_layout.addWidget(self.table)
         root.addWidget(self.filter_bar)
-        root.addSpacing(12)
         root.addWidget(viewer_card, 1)
 
-        self.apply_theme(self._theme_name)
+        self.filter_id.textChanged.connect(self._refresh_table)
+        self.filter_signal.textChanged.connect(self._refresh_table)
+        self.filter_severity.currentTextChanged.connect(self._refresh_table)
 
-    def _make_item(self, text: str, color: str, align=Qt.AlignVCenter | Qt.AlignLeft, mono=False):
-        item = QTableWidgetItem(text)
-        item.setTextAlignment(align)
-        item.setForeground(QColor(color))
-        item.setFont(QFont(FONT_FAMILY_MONO if mono else "Bahnschrift", 11 if mono else 12))
-        return item
+    def clear(self):
+        self._signals.clear()
+        self._refresh_table()
 
-    def add_mock_data(self):
-        p = get_theme_palette(self._theme_name)
-        status_colors = {
-            "critical": {"fg": p["critical_fg"], "bg": p["critical_bg"]},
-            "warning": {"fg": p["warning_fg"], "bg": None},
-            "normal": {"fg": p["normal_fg"], "bg": None},
-        }
-        frames = [
-            ("14:20:01.0342", "0x0CF004FE", "8", "FF 3D 22 00 00 00 00 00", "Engine_Speed", "1,450 RPM", "normal"),
-            ("14:20:01.0381", "0x18FEE000", "8", "AA FF 00 00 00 00 00 00", "Oil_Pressure_Critical", "8 PSI", "critical"),
-            ("14:20:01.0425", "0x0CF00300", "8", "00 22 14 AA 33 00 00 00", "Throttle_Pos", "22.4 %", "normal"),
-            ("14:20:01.0501", "0x18FEF111", "8", "12 44 55 66 77 88 99 00", "Cruis_Ctrl_Set", "---", "warning"),
-            ("14:20:01.0622", "0x0CF004FE", "8", "FF 42 22 00 00 00 00 00", "Engine_Speed", "1,482 RPM", "normal"),
-            ("14:20:01.0710", "0x1A2", "4", "0C 33 00 00", "Battery_Voltage", "14.2 V", "normal"),
-        ]
-
-        self.table.setRowCount(len(frames))
-        for row, (ts, cid, dlc, data, sig, val, status) in enumerate(frames):
-            cfg = status_colors.get(status, status_colors["normal"])
-            items = [
-                self._make_item(ts, cfg["fg"], mono=True),
-                self._make_item(cid, p["normal_id"] if status == "normal" else cfg["fg"], mono=True),
-                self._make_item(dlc, cfg["fg"], align=Qt.AlignCenter, mono=True),
-                self._make_item(data, cfg["fg"], mono=True),
-                self._make_item(sig, cfg["fg"], mono=False),
-                self._make_item(val, p["normal_value"] if status == "normal" else cfg["fg"], mono=True),
-            ]
-            for col, item in enumerate(items):
-                if cfg["bg"]:
-                    item.setBackground(QColor(cfg["bg"]))
-                self.table.setItem(row, col, item)
-            self.table.setRowHeight(row, CAN_TABLE_ROW_HEIGHT + 6)
-
-        self.table.selectRow(1)
+    def add_signal(self, signal: DecodedSignal):
+        self._signals.append(signal)
+        if len(self._signals) > self.MAX_ROWS:
+            self._signals = self._signals[-self.MAX_ROWS :]
+        self._refresh_table()
 
     def apply_theme(self, theme_name: str):
         self._theme_name = theme_name
         p = get_theme_palette(theme_name)
+
         self.filter_bar.setStyleSheet(
             f"background: {p['card_bg']}; border: 1px solid {p['card_border']}; border-radius: 12px;"
         )
-        chip_style = (
-            f"background: {p['card_hover']};"
-            f"color: {p['accent_cyan']};"
-            f"border: 1px solid {p['card_border']};"
-            "border-radius: 10px;"
-            "padding: 10px 16px;"
-            f"font-family: '{FONT_FAMILY_MONO}', 'Consolas', monospace;"
-            f"font-size: {FONT_SIZE_CAPTION}px;"
-            "font-weight: 800;"
-        )
-        self.filter_id.setStyleSheet(chip_style)
-        self.filter_signal.setStyleSheet(chip_style)
         self.header.setStyleSheet(
             f"QFrame {{ background: {p['viewer_header_bg']}; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 1px solid {p['viewer_header_border']}; }}"
         )
@@ -174,9 +118,6 @@ class CanTableWidget(QWidget):
         )
         self.stats.setStyleSheet(
             f"color: {p['viewer_stats']}; font-family: '{FONT_FAMILY_MONO}', 'Consolas', monospace; font-size: {FONT_SIZE_CAPTION}px; font-weight: 700;"
-        )
-        self.filter_add.setStyleSheet(
-            f"background: transparent; border: none; color: {p['viewer_stats']}; font-family: '{FONT_FAMILY_MONO}', 'Consolas', monospace; font-size: {FONT_SIZE_CAPTION}px; font-weight: 800; padding: 0 4px;"
         )
         self.table.setStyleSheet(
             f"""
@@ -208,5 +149,61 @@ class CanTableWidget(QWidget):
             }}
             """
         )
-        if self.table.rowCount():
-            self.add_mock_data()
+        self._refresh_table()
+
+    def _refresh_table(self):
+        p = get_theme_palette(self._theme_name)
+        id_filter = self.filter_id.text().strip().lower()
+        signal_filter = self.filter_signal.text().strip().lower()
+        severity_filter = self.filter_severity.currentText()
+        scrollbar = self.table.verticalScrollBar()
+        was_at_bottom = scrollbar.value() == scrollbar.maximum()
+
+        filtered = [signal for signal in self._signals if self._matches(signal, id_filter, signal_filter, severity_filter)]
+        filtered.reverse()
+        self.table.setRowCount(len(filtered))
+
+        severity_colors = {
+            "normal": p["normal_value"],
+            "warning": p["warning_fg"],
+            "critical": p["critical_fg"],
+        }
+        mono_font = QFont(FONT_FAMILY_MONO, max(10, FONT_SIZE_SMALL - 4))
+
+        for row, signal in enumerate(filtered):
+            values = [
+                (f"{signal.timestamp:.3f}", p["viewer_stats"], Qt.AlignVCenter | Qt.AlignLeft, True),
+                (f"0x{signal.can_id:X}", p["normal_id"], Qt.AlignCenter, True),
+                (signal.signal_name, p["viewer_table_fg"], Qt.AlignVCenter | Qt.AlignLeft, False),
+                (f"{signal.value:.2f}", severity_colors.get(signal.severity, p["viewer_table_fg"]), Qt.AlignRight | Qt.AlignVCenter, True),
+                (signal.unit, p["viewer_stats"], Qt.AlignLeft | Qt.AlignVCenter, False),
+                (signal.severity.upper(), severity_colors.get(signal.severity, p["viewer_table_fg"]), Qt.AlignCenter, True),
+            ]
+            for col, (text, color, align, mono) in enumerate(values):
+                item = QTableWidgetItem(text)
+                item.setForeground(QColor(color))
+                item.setTextAlignment(int(align))
+                if mono:
+                    item.setFont(mono_font)
+                self.table.setItem(row, col, item)
+
+        active_filters = []
+        if id_filter:
+            active_filters.append(f"id={id_filter}")
+        if signal_filter:
+            active_filters.append(f"signal={signal_filter}")
+        if severity_filter != "All severities":
+            active_filters.append(f"severity={severity_filter}")
+        self.stats.setText(f"Signals: {len(self._signals)}  |  Filters: {', '.join(active_filters) if active_filters else 'none'}")
+
+        if was_at_bottom:
+            self.table.scrollToBottom()
+
+    def _matches(self, signal: DecodedSignal, id_filter: str, signal_filter: str, severity_filter: str) -> bool:
+        if id_filter and id_filter not in f"0x{signal.can_id:X}".lower():
+            return False
+        if signal_filter and signal_filter not in signal.signal_name.lower():
+            return False
+        if severity_filter != "All severities" and signal.severity != severity_filter:
+            return False
+        return True
