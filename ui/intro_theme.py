@@ -1,17 +1,26 @@
-from PyQt5.QtGui import QFont
+try:
+    from PyQt6.QtGui import QFont
+    FONT_BOLD = QFont.Weight.Bold
+    FONT_DEMIBOLD = QFont.Weight.DemiBold
+    LETTER_SPACING_ABSOLUTE = QFont.SpacingType.AbsoluteSpacing
+except ImportError:
+    from PyQt5.QtGui import QFont
+    FONT_BOLD = QFont.Bold
+    FONT_DEMIBOLD = QFont.DemiBold
+    LETTER_SPACING_ABSOLUTE = QFont.AbsoluteSpacing
 
 
 INTRO_SPLASH_THEME = {
     "display_ms": 2600,
     "tick_ms": 16,
     "progress_max": 1000,
-    "width": 1100,
-    "height": 680,
-    "root_margin": 18,
-    "panel_margin": 24,
-    "panel_spacing": 18,
+    "width": 860,
+    "height": 520,
+    "root_margin": 14,
+    "panel_margin": 18,
+    "panel_spacing": 14,
     "panel_radius": 14,
-    "media_min_height": 470,
+    "media_min_height": 320,
     "media_radius": 12,
     "progress_height": 12,
     "progress_radius": 6,
@@ -58,11 +67,11 @@ INTRO_SPLASH_THEME = {
 
 
 def intro_title_font() -> QFont:
-    font = QFont("Rajdhani", 28, QFont.Bold)
+    font = QFont("Rajdhani", 28, FONT_BOLD)
     if font.family() == "Rajdhani":
-        font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
+        font.setLetterSpacing(LETTER_SPACING_ABSOLUTE, 2)
     return font
 
 
 def intro_subtitle_font() -> QFont:
-    return QFont("Bahnschrift", 16, QFont.DemiBold)
+    return QFont("Bahnschrift", 16, FONT_DEMIBOLD)

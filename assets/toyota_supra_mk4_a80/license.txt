@@ -1,0 +1,11 @@
+Model Information:
+* title:	TOYOTA SUPRA MK4 (A80)
+* source:	https://sketchfab.com/3d-models/toyota-supra-mk4-a80-61d402d6de904374bfe5a98907c85b1d
+* author:	temich (https://sketchfab.com/temich_)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "TOYOTA SUPRA MK4 (A80)" (https://sketchfab.com/3d-models/toyota-supra-mk4-a80-61d402d6de904374bfe5a98907c85b1d) by temich (https://sketchfab.com/temich_) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

@@ -3,9 +3,12 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, Iterable, List, Tuple
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout
+from .qt_compat import QColor, Qt
+
+try:
+    from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout
+except ImportError:  # pragma: no cover - optional fallback
+    from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout
 
 from .theme import CARD_MARGIN, FONT_FAMILY_MONO, FONT_SIZE_CAPTION, FONT_SIZE_HERO, FONT_SIZE_LARGE, INFO_BLOCK_BAR_HEIGHT, mono_font
 

@@ -22,6 +22,7 @@ from .theme import (
 
 class ImportOverlay(QWidget):
     closed = pyqtSignal()
+    back_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -89,7 +90,16 @@ class ImportOverlay(QWidget):
         title_wrap.addWidget(title)
         title_wrap.addWidget(subtitle)
 
-        self.close_btn = QPushButton("×")
+        self.back_btn = QPushButton("<")
+        self.back_btn.setCursor(Qt.PointingHandCursor)
+        self.back_btn.setFixedSize(EXPORT_CLOSE_BUTTON, EXPORT_CLOSE_BUTTON)
+        self.back_btn.setStyleSheet(
+            "QPushButton { color: #8FE8FF; background: rgba(10, 22, 34, 190); border: 1px solid rgba(0, 200, 255, 110); border-radius: 16px; min-height: 0px; font-size: 18px; font-weight: 700; }"
+            "QPushButton:hover { color: #FFFFFF; border-color: rgba(255, 60, 247, 160); }"
+        )
+        self.back_btn.clicked.connect(self.back_requested.emit)
+
+        self.close_btn = QPushButton("x")
         self.close_btn.setCursor(Qt.PointingHandCursor)
         self.close_btn.setFixedSize(EXPORT_CLOSE_BUTTON, EXPORT_CLOSE_BUTTON)
         self.close_btn.setStyleSheet(
@@ -97,9 +107,10 @@ class ImportOverlay(QWidget):
             "QPushButton:hover { color: #FFFFFF; }"
         )
         self.close_btn.clicked.connect(self.close_overlay)
+        header.addWidget(self.back_btn)
         header.addLayout(title_wrap)
         header.addWidget(self.close_btn)
-        header.setStretch(0, 1)
+        header.setStretch(1, 1)
 
         body = QWidget()
         body_layout = QVBoxLayout(body)

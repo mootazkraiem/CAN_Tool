@@ -37,6 +37,7 @@ from .theme import (
 class ExportOverlay(QWidget):
     closed = pyqtSignal()
     exported = pyqtSignal(str)
+    back_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -149,6 +150,16 @@ class ExportOverlay(QWidget):
         )
         self.close_btn.clicked.connect(self.close_overlay)
 
+        self.back_btn = QPushButton("<")
+        self.back_btn.setCursor(Qt.PointingHandCursor)
+        self.back_btn.setFixedSize(EXPORT_CLOSE_BUTTON, EXPORT_CLOSE_BUTTON)
+        self.back_btn.setStyleSheet(
+            "QPushButton { color: #8FE8FF; background: rgba(10, 22, 34, 190); border: 1px solid rgba(0, 200, 255, 110); border-radius: 16px; min-height: 0px; font-size: 18px; font-weight: 700; }"
+            "QPushButton:hover { color: #FFFFFF; border-color: rgba(255, 60, 247, 160); }"
+        )
+        self.back_btn.clicked.connect(self.back_requested.emit)
+
+        header_layout.addWidget(self.back_btn, alignment=Qt.AlignTop)
         header_layout.addLayout(title_wrap)
         header_layout.addStretch()
         header_layout.addWidget(self.close_btn, alignment=Qt.AlignTop)
