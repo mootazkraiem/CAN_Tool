@@ -1,0 +1,286 @@
+<UserControl
+    x:Class="CANvision.Native.UI.DashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:CANvision.Native.ViewModels"
+    xmlns:models="clr-namespace:CANvision.Native.Models">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush
+                ImageSource="pack://siteoforigin:,,,/assets/6k+-D+copy+-+High+Contrast.webp"
+                Stretch="UniformToFill"
+                Opacity="1.0" />
+        </Grid.Background>
+
+        <Rectangle Fill="#0B0F0F" Opacity="0.55" />
+        <Rectangle>
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="0.52,0.45" GradientOrigin="0.52,0.45" RadiusX="0.65" RadiusY="0.52">
+                    <GradientStop Color="#1400F6FF" Offset="0" />
+                    <GradientStop Color="#900B0F0F" Offset="0.62" />
+                    <GradientStop Color="#ED0B0F0F" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <ScrollViewer
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled"
+            CanContentScroll="True">
+            <Grid Margin="18,0,18,28">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="258" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="238" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="132" />
+                </Grid.RowDefinitions>
+
+            <StackPanel Grid.Column="0" Grid.RowSpan="2" Margin="0,0,20,0">
+                <Border
+                    Padding="14"
+                    Background="#A20A1011"
+                    BorderBrush="#7300F6FF"
+                    BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Foreground="#557A86" FontFamily="Consolas" FontSize="10" Text="TACTICAL ASSET" />
+                        <TextBlock Grid.Row="1" Margin="0,10,0,0" Foreground="#22F4FF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="24" FontWeight="Bold" Text="MODEL_S_PLAID_G2" />
+
+                        <Grid Grid.Row="2" Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Foreground="#4A6870" FontFamily="Consolas" FontSize="9" Text="UPLINK STATUS" />
+                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="REAL_TIME" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Foreground="#4A6870" FontFamily="Consolas" FontSize="9" Text="WORKSPACE" />
+                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="X-392-ALPHA" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle Grid.Row="3" Height="1" Margin="0,14,0,0" VerticalAlignment="Top" Fill="#2200F6FF" />
+                    </Grid>
+                </Border>
+
+                <Button
+                    Margin="0,16,0,0"
+                    Style="{StaticResource HudActionButtonStyle}"
+                    Content="START SESSION" />
+
+                <Button
+                    Margin="0,10,0,0"
+                    Style="{StaticResource HudActionButtonStyle}"
+                    Content="STOP SESSION" />
+
+                <Border
+                    Margin="0,26,0,0"
+                    Padding="14"
+                    Background="#7F0B0F0F"
+                    BorderBrush="#1C3940"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#47656E" FontFamily="Consolas" FontSize="10" Text="SYNC" />
+                        <TextBlock Margin="0,8,0,0" Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="32" FontWeight="Bold" Text="{Binding BatteryText}" />
+                        <TextBlock Margin="0,4,0,0" Foreground="#82A7B0" FontFamily="Consolas" FontSize="11" Text="ENERGY RESERVE" />
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,18,0,0"
+                    Padding="14"
+                    Background="#7F0B0F0F"
+                    BorderBrush="#1C3940"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#47656E" FontFamily="Consolas" FontSize="10" Text="OPEN CHANNELS" />
+                        <Button
+                            Margin="0,12,0,0"
+                            Style="{StaticResource HudActionButtonStyle}"
+                            Command="{Binding DataContext.NavigationService.NavigateToSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{x:Static models:SectionKey.Telemetry}"
+                            Content="OPEN TELEMETRY" />
+                        <Button
+                            Margin="0,10,0,0"
+                            Style="{StaticResource HudActionButtonStyle}"
+                            Command="{Binding DataContext.NavigationService.NavigateToSectionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{x:Static models:SectionKey.Diagnostics}"
+                            Content="RUN DIAGNOSTICS" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Grid Grid.Column="1" Margin="0,0,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border
+                    Padding="24"
+                    Background="#52070B0C"
+                    BorderBrush="#1A3C42"
+                    BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <DockPanel>
+                            <TextBlock Foreground="#47656E" FontFamily="Consolas" FontSize="10" Text="TACTICAL OVERLAY" />
+                            <TextBlock DockPanel.Dock="Right" Foreground="#83B8BF" FontFamily="Consolas" FontSize="10" Text="{Binding ConnectionStateText}" />
+                        </DockPanel>
+
+                        <Grid Grid.Row="1" Margin="0,18,0,18">
+                            <Rectangle Fill="#B4000000" Stroke="#142B31" StrokeThickness="1" />
+                            <Image
+                                Margin="38,24,38,24"
+                                Opacity="1.0"
+                                Stretch="Uniform"
+                                Source="pack://siteoforigin:,,,/assets/a8fcb679-2238-4e81-90ce-8e9627b40a3e.png" />
+                            <Rectangle Margin="64,42,64,42" Stroke="#2400F6FF" StrokeThickness="1">
+                                <Rectangle.StrokeDashArray>4,8</Rectangle.StrokeDashArray>
+                            </Rectangle>
+
+                            <Border
+                                Width="102"
+                                Height="86"
+                                Margin="26,34,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Background="#C40C1112"
+                                BorderBrush="#2B4B52"
+                                BorderThickness="1">
+                                <StackPanel Margin="12">
+                                    <TextBlock Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="42" FontWeight="Bold" Text="{Binding Battery}" />
+                                    <TextBlock Margin="0,-4,0,0" Foreground="#6A8E95" FontFamily="Consolas" FontSize="10" Text="ENERGY RESERVE" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                Width="122"
+                                Margin="0,0,42,44"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Background="#C40C1112"
+                                BorderBrush="#2B4B52"
+                                BorderThickness="1">
+                                <StackPanel Margin="12">
+                                    <TextBlock Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="18" FontWeight="Bold" Text="NOMINAL 32C" />
+                                    <TextBlock Margin="0,4,0,0" Foreground="#6A8E95" FontFamily="Consolas" FontSize="10" Text="THERMAL CORE STATE" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                Width="108"
+                                Height="54"
+                                Margin="0,0,86,12"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Background="#C40C1112"
+                                BorderBrush="#2B4B52"
+                                BorderThickness="1">
+                                <StackPanel Margin="10">
+                                    <TextBlock Foreground="#6A8E95" FontFamily="Consolas" FontSize="9" Text="SIGNAL STATE" />
+                                    <TextBlock Margin="0,2,0,0" Foreground="#D9F8FB" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="14" FontWeight="Bold" Text="STABLE" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <Ellipse Width="4" Height="4" Margin="0,0,8,0" Fill="#1DEFFF" />
+                            <TextBlock Foreground="#557A86" FontFamily="Consolas" FontSize="10" Text="{Binding DataRibbon}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Margin="0,0,0,12" Foreground="#4E7078" FontFamily="Consolas" FontSize="10" Text="SUBSYSTEM TELEMETRY" />
+
+                <ItemsControl ItemsSource="{Binding SubsystemHealth}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:MetricCardItem}">
+                            <Border
+                                Margin="0,0,0,10"
+                                Padding="12"
+                                Background="#930B0F10"
+                                BorderBrush="#243B41"
+                                BorderThickness="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="20" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="{Binding Title}" />
+                                        <TextBlock Margin="0,6,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="20" FontWeight="Bold" Text="{Binding Value}" />
+                                        <TextBlock Margin="0,3,0,0" Foreground="#71939A" FontFamily="Consolas" FontSize="10" Text="{Binding Detail}" />
+                                    </StackPanel>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Foreground="#1DEFFF"
+                                        FontFamily="Consolas"
+                                        FontSize="14"
+                                        Text="|" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+
+            </StackPanel>
+
+                <UniformGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,22,0,0" Columns="5">
+                <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
+                    <StackPanel VerticalAlignment="Stretch">
+                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="SOC" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="{Binding BatteryText}" />
+                    </StackPanel>
+                </Border>
+                <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="AMP" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="0" />
+                    </StackPanel>
+                </Border>
+                <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="SPEED" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="{Binding SpeedText}" />
+                    </StackPanel>
+                </Border>
+                <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="TEMP" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="{Binding TemperatureText}" />
+                    </StackPanel>
+                </Border>
+                <Border Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="VOLT" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="{Binding VoltageText}" />
+                        <TextBlock Margin="0,8,0,0" Foreground="#1DEFFF" FontFamily="Consolas" FontSize="10" Text="{Binding GpsStatusText}" />
+                    </StackPanel>
+                </Border>
+                </UniformGrid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

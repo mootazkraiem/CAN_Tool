@@ -1,0 +1,146 @@
+﻿<UserControl
+    x:Class="CANvision.Native.UI.AnalyticsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:CANvision.Native.ViewModels">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="pack://siteoforigin:,,,/assets/6k+-D+copy+-+High+Contrast.webp" Stretch="UniformToFill" Opacity="0.24" />
+        </Grid.Background>
+        <Rectangle Fill="#E0080C0F" />
+
+        <Grid Margin="24,20,24,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="260" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Foreground="#6A909A" FontFamily="Consolas" FontSize="10" Text="PRIMARY FILTERS" />
+                    <TextBlock Margin="0,14,0,0" Foreground="#597983" FontFamily="Consolas" FontSize="9" Text="DATE RANGE" />
+                    <ComboBox Margin="0,4,0,0" Style="{StaticResource HudComboBoxStyle}" SelectedIndex="0"><ComboBoxItem Content="Last 30 Days" /></ComboBox>
+                    <TextBlock Margin="0,12,0,0" Foreground="#597983" FontFamily="Consolas" FontSize="9" Text="PROFILE" />
+                    <ComboBox Margin="0,4,0,0" Style="{StaticResource HudComboBoxStyle}" SelectedIndex="0"><ComboBoxItem Content="P-800 Performance" /></ComboBox>
+
+                    <TextBlock Margin="0,14,0,0" Foreground="#597983" FontFamily="Consolas" FontSize="9" Text="CATEGORY" />
+                    <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding SidebarSections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Margin="0,0,0,6" Padding="8,4" Command="{Binding DataContext.SelectAnalyticsSectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource HudActionButtonStyle}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                            <Setter Property="Background" Value="#800A0E10" />
+                                        </Style>
+                                    </Button.Style>
+                                    <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="10" />
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Margin="0,14,0,0" Style="{StaticResource HudActionButtonStyle}" Content="GENERATE REPORT" />
+                    <Button Margin="0,8,0,0" Style="{StaticResource HudActionButtonStyle}" Content="COMPARE SESSIONS" />
+
+                    <Border Margin="0,18,0,0" Padding="10" Background="#7A0A0E10" BorderBrush="#1E2F363C" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Foreground="#617F88" FontFamily="Consolas" FontSize="9" Text="SYSTEM STATUS" />
+                            <TextBlock Margin="0,4,0,0" Foreground="#D7EDF2" FontFamily="Consolas" FontSize="10" Text="NOMINAL" />
+                            <Rectangle Margin="0,8,0,0" Height="2" Fill="#3ABFD0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Grid Grid.Column="1" Margin="16,0,16,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="250" />
+                    <RowDefinition Height="150" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Padding="14" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                    <Grid>
+                        <DockPanel>
+                            <TextBlock Foreground="#DAEFF3" FontFamily="Consolas" FontSize="14" FontWeight="Bold" Text="BATTERY DEGRADATION TREND" />
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <TextBlock Foreground="#00ECFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="40" FontWeight="Bold" Text="{Binding BatteryHealthIndexText}" />
+                            </StackPanel>
+                        </DockPanel>
+                        <UniformGrid Margin="0,48,0,18" VerticalAlignment="Bottom" Columns="6">
+                            <Border Margin="0,0,8,0" Background="#251CE3F4" Height="120" VerticalAlignment="Bottom" />
+                            <Border Margin="0,0,8,0" Background="#251CE3F4" Height="102" VerticalAlignment="Bottom" />
+                            <Border Margin="0,0,8,0" Background="#251CE3F4" Height="114" VerticalAlignment="Bottom" />
+                            <Border Margin="0,0,8,0" Background="#251CE3F4" Height="94" VerticalAlignment="Bottom" />
+                            <Border Margin="0,0,8,0" Background="#251CE3F4" Height="128" VerticalAlignment="Bottom" />
+                            <Border Background="#251CE3F4" Height="116" VerticalAlignment="Bottom" />
+                        </UniformGrid>
+                    </Grid>
+                </Border>
+
+                <UniformGrid Grid.Row="1" Margin="0,12,0,12" Columns="2">
+                    <Border Margin="0,0,8,0" Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Foreground="#00ECFF" FontFamily="Consolas" FontSize="10" Text="THERMAL EFFICIENCY" />
+                            <TextBlock Margin="0,10,0,0" Foreground="#E2F2F6" FontFamily="Consolas" FontSize="12" Text="CORE TEMP VARIANCE" />
+                            <TextBlock Margin="0,4,0,0" Foreground="#00ECFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="22" Text="{Binding HeatIndex, StringFormat={}{0}%}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Foreground="#00ECFF" FontFamily="Consolas" FontSize="10" Text="VOLTAGE STABILITY" />
+                            <TextBlock Margin="0,10,0,0" Foreground="#E2F2F6" FontFamily="Consolas" FontSize="12" Text="PACK VOLTAGE" />
+                            <TextBlock Margin="0,4,0,0" Foreground="#E2F2F6" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="22" Text="{Binding VoltageText}" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <Border Grid.Row="2" Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                    <StackPanel>
+                        <DockPanel>
+                            <TextBlock Foreground="#00ECFF" FontFamily="Consolas" FontSize="10" Text="AI ANOMALY FREQUENCY" />
+                            <Button DockPanel.Dock="Right" Width="110" Style="{StaticResource HudActionButtonStyle}" Content="EXPORT CHARTS" />
+                        </DockPanel>
+                        <TextBlock Margin="0,10,0,0" Foreground="#A2C0C8" FontFamily="Consolas" FontSize="11" Text="{Binding AnalyticsSummary}" TextWrapping="Wrap" />
+                        <Rectangle Margin="0,16,0,0" Width="26" Height="80" Fill="#9BFF4F5F" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <StackPanel Grid.Column="2">
+                <Border Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                    <StackPanel>
+                        <DockPanel>
+                            <TextBlock Foreground="#6A909A" FontFamily="Consolas" FontSize="10" Text="FAILURE RATE" />
+                            <TextBlock DockPanel.Dock="Right" Foreground="#00ECFF" FontFamily="Consolas" FontSize="10" Text="ALERT" />
+                        </DockPanel>
+                        <TextBlock Margin="0,8,0,0" Foreground="#E6F6FA" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="46" Text="{Binding AvgAnomalyRateText}" />
+                        <TextBlock Foreground="#E95A66" FontFamily="Consolas" FontSize="11" Text="CRITICAL" />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,12,0,0" Padding="12" Background="#AA0A0F11" BorderBrush="#253A41" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Foreground="#6A909A" FontFamily="Consolas" FontSize="10" Text="ACTION PROTOCOLS" />
+                        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding ActionProtocols}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:RecommendationItem}">
+                                    <Border Margin="0,0,0,8" Padding="8" Background="#760A0E10" BorderBrush="#1E2F363C" BorderThickness="1">
+                                        <StackPanel>
+                                            <TextBlock Foreground="#11EDFF" FontFamily="Consolas" FontSize="10" Text="{Binding Title}" />
+                                            <TextBlock Margin="0,3,0,0" Foreground="#9DBAC2" FontFamily="Consolas" FontSize="9" Text="{Binding Detail}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Margin="0,8,0,0" Foreground="#6A909A" FontFamily="Consolas" FontSize="10" Text="RELIABILITY SCORE" />
+                        <TextBlock Margin="0,4,0,0" Foreground="#DDF1F6" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="26" Text="{Binding ReliabilityScoreText}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

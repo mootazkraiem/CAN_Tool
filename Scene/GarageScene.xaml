@@ -1,0 +1,31 @@
+<UserControl
+    x:Class="CANvision.Native.Scene.GarageScene"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:hx="clr-namespace:HelixToolkit.Wpf.SharpDX;assembly=HelixToolkit.Wpf.SharpDX">
+    <Grid Background="Transparent" ClipToBounds="False">
+        <hx:Viewport3DX
+            x:Name="Viewport"
+            Panel.ZIndex="1"
+            Background="Transparent"
+            BackgroundColor="#00000000"
+            CameraMode="Inspect"
+            ClipToBounds="False"
+            EnableSwapChainRendering="False"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            IsHitTestVisible="True"
+            Margin="0"
+            ShowCoordinateSystem="False"
+            ShowViewCube="False"
+            ShowFrameRate="False"
+            UseDefaultGestures="False"
+            ZoomExtentsWhenLoaded="False">
+            <hx:AmbientLight3D Color="#161B22" />
+            <hx:DirectionalLight3D Color="#E8EEFF" Direction="-1.25,-1.0,-0.65" />
+            <hx:DirectionalLight3D Color="#7C5FFF" Direction="0.85,-0.42,0.95" />
+            <hx:DirectionalLight3D Color="#15D4FF" Direction="-0.18,-0.32,1.0" />
+            <hx:SceneNodeGroupModel3D x:Name="CarNodeGroup" />
+        </hx:Viewport3DX>
+    </Grid>
+</UserControl>

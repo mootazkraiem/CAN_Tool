@@ -1,1 +1,8 @@
+/bin
+/obj
+/logs
+/.vs
+/.tmp_py
 /can_env
+/can_env_313
+/can_env_313_broken

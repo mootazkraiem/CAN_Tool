@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>HelixToolkit</id>
+    <version>2.27.3</version>
+    <title>Helix Toolkit (portable library)</title>
+    <authors>Lunci, objo</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>helixtoolkit.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/helix-toolkit/helix-toolkit</projectUrl>
+    <description>Portable core assembly that is referenced by the other Helix Toolkit packages.</description>
+    <tags>3D</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="6.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
