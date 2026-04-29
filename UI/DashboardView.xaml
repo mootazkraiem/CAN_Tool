@@ -53,7 +53,7 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Foreground="#557A86" FontFamily="Consolas" FontSize="10" Text="TACTICAL ASSET" />
-                        <TextBlock Grid.Row="1" Margin="0,10,0,0" Foreground="#22F4FF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="24" FontWeight="Bold" Text="MODEL_S_PLAID_G2" />
+                        <TextBlock Grid.Row="1" Margin="0,10,0,0" Foreground="#22F4FF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="24" FontWeight="Bold" Text="{Binding ModelText}" />
 
                         <Grid Grid.Row="2" Margin="0,12,0,0">
                             <Grid.ColumnDefinitions>
@@ -62,11 +62,11 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <TextBlock Foreground="#4A6870" FontFamily="Consolas" FontSize="9" Text="UPLINK STATUS" />
-                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="REAL_TIME" />
+                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="{Binding ConnectivityText}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Foreground="#4A6870" FontFamily="Consolas" FontSize="9" Text="WORKSPACE" />
-                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="X-392-ALPHA" />
+                                <TextBlock Margin="0,4,0,0" Foreground="#D9F8FB" FontFamily="Consolas" FontSize="11" Text="{Binding WorkspaceText}" />
                             </StackPanel>
                         </Grid>
 
@@ -77,11 +77,13 @@
                 <Button
                     Margin="0,16,0,0"
                     Style="{StaticResource HudActionButtonStyle}"
+                    Command="{Binding StartSessionCommand}"
                     Content="START SESSION" />
 
                 <Button
                     Margin="0,10,0,0"
                     Style="{StaticResource HudActionButtonStyle}"
+                    Command="{Binding StopSessionCommand}"
                     Content="STOP SESSION" />
 
                 <Border
@@ -179,7 +181,7 @@
                                 BorderBrush="#2B4B52"
                                 BorderThickness="1">
                                 <StackPanel Margin="12">
-                                    <TextBlock Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="18" FontWeight="Bold" Text="NOMINAL 32C" />
+                                    <TextBlock Foreground="#1DEFFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="18" FontWeight="Bold" Text="{Binding ThermalCoreStateText}" />
                                     <TextBlock Margin="0,4,0,0" Foreground="#6A8E95" FontFamily="Consolas" FontSize="10" Text="THERMAL CORE STATE" />
                                 </StackPanel>
                             </Border>
@@ -195,7 +197,7 @@
                                 BorderThickness="1">
                                 <StackPanel Margin="10">
                                     <TextBlock Foreground="#6A8E95" FontFamily="Consolas" FontSize="9" Text="SIGNAL STATE" />
-                                    <TextBlock Margin="0,2,0,0" Foreground="#D9F8FB" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="14" FontWeight="Bold" Text="STABLE" />
+                                    <TextBlock Margin="0,2,0,0" Foreground="#D9F8FB" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="14" FontWeight="Bold" Text="{Binding SignalHealthText}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -257,7 +259,7 @@
                 <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">
                     <StackPanel>
                         <TextBlock Foreground="#4E7078" FontFamily="Consolas" FontSize="9" Text="AMP" />
-                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="0" />
+                        <TextBlock Margin="0,18,0,0" Foreground="#E4FBFF" FontFamily="{StaticResource HeadlineFontFamily}" FontSize="28" FontWeight="Bold" Text="{Binding AmpText}" />
                     </StackPanel>
                 </Border>
                 <Border Margin="0,0,10,0" Padding="14" Background="#900B0F10" BorderBrush="#1A3237" BorderThickness="1">

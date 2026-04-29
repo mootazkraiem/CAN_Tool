@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Threading;
 using CANvision.Native.Scene;
 using CANvision.Native.Services;
 using CANvision.Native.UI;
@@ -23,13 +24,14 @@ public partial class App : Application
         
         DispatcherUnhandledException += (s, args) => {
             logger.Error("Unhandled Dispatcher Exception", args.Exception);
-            args.Handled = false;
+            args.Handled = true;
         };
 
         logger.Info("Application startup sequence initiated.");
 
         var pythonApiClient = new PythonApiClient(logger);
         vehicleDataService = new VehicleDataService(pythonApiClient, logger);
+        var canLogImportService = new CanLogImportService(logger, pythonApiClient);
         var backgroundManager = new BackgroundManager(logger);
 
         var analytics = new AnalyticsViewModel(vehicleDataService);
@@ -38,9 +40,9 @@ public partial class App : Application
 
         var home = new HomeViewModel(vehicleDataService);
         var dashboard = new DashboardViewModel(vehicleDataService);
-        var telemetry = new TelemetryViewModel(vehicleDataService);
+        var telemetry = new TelemetryViewModel(vehicleDataService, canLogImportService);
         var diagnostics = new DiagnosticsViewModel(vehicleDataService);
-        var playback = new LogPlaybackViewModel(vehicleDataService);
+        var playback = new LogPlaybackViewModel(vehicleDataService, canLogImportService, logger);
 
         var navigationService = new NavigationService(
             logger,
@@ -53,20 +55,32 @@ public partial class App : Application
             settings,
             preview);
         preview.AttachNavigationService(navigationService);
+        navigationService.NavigateTo("Home");
+        logger.Info("Startup navigation set to Home.");
 
         var mainWindowViewModel = new MainWindowViewModel(
             navigationService,
             vehicleDataService,
             backgroundManager);
 
-        vehicleDataService.Start();
-
         logger.Info("Initializing MainWindow...");
         var window = new MainWindow(mainWindowViewModel, logger);
+        window.Show();
+        window.Activate();
+        window.Focus();
         MainWindow = window;
         
         logger.Info("Displaying MainWindow...");
-        window.Show();
+        logger.Info($"IsVisible: {window.IsVisible}");
+        logger.Info($"State: {window.WindowState}");
+        logger.Info($"Size: {window.Width}x{window.Height}");
+
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            logger.Info("Starting vehicle data service after initial window render.");
+            vehicleDataService.Start();
+        }), DispatcherPriority.Background);
+
         logger.Info("Application startup sequence completed.");
     }
 
