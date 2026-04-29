@@ -33,7 +33,7 @@ public sealed class NavigationService : ObservableObject
         PreviewSectionCommand = new RelayCommand<NavigationItemViewModel?>(PreviewSection);
         NavigateCommand = new RelayCommand<NavigationItemViewModel?>(Navigate);
         NavigateToSectionCommand = new RelayCommand<SectionKey>(NavigateToSection);
-        EnterSystemCommand = new RelayCommand(EnterSystem, () => IsLandingVisible || IsHomeVisible);
+        EnterSystemCommand = new RelayCommand(EnterSystem, () => IsLandingVisible || IsHomeVisible || ReferenceEquals(CurrentSection, HomeSection));
         NavigateHomeCommand = new RelayCommand(NavigateHome, () => CanNavigateHome);
         BackToHubCommand = new RelayCommand(ExecuteBackToHub, () => IsSystemVisible);
         currentSection = dashboard;
@@ -80,6 +80,17 @@ public sealed class NavigationService : ObservableObject
 
     public bool CanNavigateHome => !IsHomeVisible;
 
+    public void NavigateTo(string key)
+    {
+        if (!Enum.TryParse<SectionKey>(key, ignoreCase: true, out var sectionKey))
+        {
+            logger.Error($"Navigation target '{key}' is not a valid section key.");
+            return;
+        }
+
+        NavigateToSection(sectionKey);
+    }
+
     private static IEnumerable<NavigationItemViewModel> BuildTabs(
         DashboardViewModel dashboard,
         TelemetryViewModel telemetry,
@@ -100,10 +111,11 @@ public sealed class NavigationService : ObservableObject
 
         foreach (var section in sections)
         {
+            var descriptor = section.Descriptor ?? SectionCatalog.For(section.Key);
             yield return new NavigationItemViewModel(
-                section.Descriptor.ModuleCode,
-                section.Descriptor.Title,
-                section.Descriptor.MenuDescription,
+                descriptor.ModuleCode,
+                descriptor.Title,
+                descriptor.MenuDescription,
                 section);
         }
     }
@@ -137,7 +149,7 @@ public sealed class NavigationService : ObservableObject
 
     private void EnterSystem()
     {
-        if (!IsLandingVisible && !IsHomeVisible)
+        if (!IsLandingVisible && !IsHomeVisible && !ReferenceEquals(CurrentSection, HomeSection))
         {
             return;
         }
@@ -166,7 +178,10 @@ public sealed class NavigationService : ObservableObject
     {
         if (key == SectionKey.Home)
         {
-            NavigateHome();
+            ClearActiveTabs();
+            SetCurrentSection(HomeSection);
+            SetStage(NavigationStage.Interface);
+            logger.Info("Navigation initialized to Home.");
             return;
         }
 
@@ -197,6 +212,7 @@ public sealed class NavigationService : ObservableObject
         }
 
         CurrentSection = section;
+        EnterSystemCommand.NotifyCanExecuteChanged();
     }
 
     private void SetStage(NavigationStage nextStage)
