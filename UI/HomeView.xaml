@@ -4,92 +4,70 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="clr-namespace:CANvision.Native.UI">
     <Grid Margin="0">
-        <Grid
+        <Border
             x:Name="CommandCardHost"
-            Margin="24,24,0,0"
+            Margin="40"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Opacity="0">
-            <Grid>
-                <Grid.RenderTransform>
-                    <TranslateTransform Y="24" />
-                </Grid.RenderTransform>
-
-                <Grid.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation
-                                    Storyboard.TargetName="CommandCardHost"
-                                    Storyboard.TargetProperty="Opacity"
-                                    From="0"
-                                    To="1"
-                                    Duration="0:0:0.38" />
-                                <DoubleAnimation
-                                    Storyboard.TargetName="CommandCardHost"
-                                    Storyboard.TargetProperty="RenderTransform.(TranslateTransform.Y)"
-                                    From="24"
-                                    To="0"
-                                    Duration="0:0:0.42">
-                                    <DoubleAnimation.EasingFunction>
-                                        <CubicEase EasingMode="EaseOut" />
-                                    </DoubleAnimation.EasingFunction>
-                                </DoubleAnimation>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Grid.Triggers>
-
-                <Border Style="{StaticResource HudCommandCardStyle}">
-                    <Grid ClipToBounds="True">
-                        <Border
-                            Margin="1"
-                            CornerRadius="27"
-                            Background="#09263140"
-                            BorderBrush="#11FFFFFF"
-                            BorderThickness="1" />
-
-                        <Rectangle Height="1" VerticalAlignment="Top" Fill="#6AEFFF" />
-                        <Rectangle Width="42" Height="1.4" Margin="18,18,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#A0F6FF" />
-                        <Rectangle Width="1.4" Height="18" Margin="18,18,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#A0F6FF" />
-                        <Rectangle Width="42" Height="1.4" Margin="0,18,18,0" HorizontalAlignment="Right" VerticalAlignment="Top" Fill="#58D9F3" />
-                        <Rectangle Width="1.4" Height="18" Margin="0,18,18,0" HorizontalAlignment="Right" VerticalAlignment="Top" Fill="#58D9F3" />
-                        <Rectangle Width="42" Height="1.4" Margin="18,0,0,18" HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="#58D9F3" />
-                        <Rectangle Width="1.4" Height="18" Margin="18,0,0,18" HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="#58D9F3" />
-                        <Rectangle Width="42" Height="1.4" Margin="0,0,18,18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#A0F6FF" />
-                        <Rectangle Width="1.4" Height="18" Margin="0,0,18,18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#A0F6FF" />
-
-                        <Grid Margin="30,28,30,28">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Text="GARAGE COMMAND DECK" Style="{StaticResource HudEyebrowTextStyle}" />
-
-                            <TextBlock
-                                Grid.Row="1"
-                                Margin="0,14,0,0"
-                                Text="CANvision Native Garage"
-                                Style="{StaticResource HudTitleTextStyle}" />
-
-                            <ui:TypewriterTextBlock
-                                Grid.Row="2"
-                                Margin="0,18,0,0"
-                                Text="{Binding LaunchGuidance}"
-                                CharacterInterval="20" />
-                        </Grid>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Grid>
+            Padding="20,16"
+            Opacity="0"
+            Background="#BB091012"
+            BorderBrush="#4400FFFF"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Border.RenderTransform>
+                <TranslateTransform Y="18" />
+            </Border.RenderTransform>
+            <Border.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetName="CommandCardHost"
+                                Storyboard.TargetProperty="Opacity"
+                                From="0"
+                                To="1"
+                                Duration="0:0:0.38" />
+                            <DoubleAnimation
+                                Storyboard.TargetName="CommandCardHost"
+                                Storyboard.TargetProperty="RenderTransform.(TranslateTransform.Y)"
+                                From="18"
+                                To="0"
+                                Duration="0:0:0.42">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+            <StackPanel>
+                <TextBlock
+                    Text="GARAGE COMMAND DECK"
+                    Foreground="#9CDFF0"
+                    FontSize="11"
+                    FontFamily="Consolas" />
+                <TextBlock
+                    Margin="0,8,0,0"
+                    Text="READY"
+                    Foreground="#FFFFFF"
+                    FontSize="28"
+                    FontWeight="SemiBold" />
+                <TextBlock
+                    Margin="0,10,0,0"
+                    Text="{Binding ConnectivityText}"
+                    Foreground="#A7BCC4"
+                    FontSize="12" />
+            </StackPanel>
+        </Border>
 
         <Button
             x:Name="EnterSystemButton"
-            Margin="0,0,0,28"
+            Margin="0,0,0,80"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"
+            IsEnabled="True"
             Opacity="0"
             Style="{StaticResource HudHeroCapsuleButtonStyle}"
             Command="{Binding DataContext.NavigationService.EnterSystemCommand, RelativeSource={RelativeSource AncestorType=Window}}">

@@ -17,7 +17,7 @@
             </Ellipse.Fill>
         </Ellipse>
 
-        <!-- Top-Left Back To Main Screen -->
+        <!-- Top-Left Back To Garage -->
         <Button Command="{Binding DataContext.NavigateHomeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
@@ -26,7 +26,7 @@
                 Panel.ZIndex="10">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="&lt;" FontFamily="Consolas" Margin="0,0,8,0" FontSize="14" VerticalAlignment="Center"/>
-                <TextBlock Text="BACK TO LANDING" FontSize="12" VerticalAlignment="Center" />
+                <TextBlock Text="BACK TO GARAGE" FontSize="12" VerticalAlignment="Center" />
             </StackPanel>
         </Button>
 

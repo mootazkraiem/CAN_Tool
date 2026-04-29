@@ -49,7 +49,7 @@
                                 FontFamily="{StaticResource HeadlineFontFamily}"
                                 FontSize="18"
                                 FontWeight="Bold"
-                                Text="CAN_01" />
+                                Text="{Binding UnitNameText}" />
                         </StackPanel>
                     </Border>
 
@@ -80,7 +80,7 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Style="{StaticResource HudEyebrowTextStyle}" Text="SIGNAL REGISTRY" />
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource HudMutedTextStyle}" Text="L_128_MS" />
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource HudMutedTextStyle}" Text="{Binding SampleRateText}" />
                             </DockPanel>
 
                             <Grid Margin="0,16,0,10">
@@ -88,12 +88,16 @@
                                     <ColumnDefinition Width="60" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="84" />
-                                    <ColumnDefinition Width="44" />
+                                    <ColumnDefinition Width="64" />
+                                    <ColumnDefinition Width="64" />
+                                    <ColumnDefinition Width="34" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Style="{StaticResource HudMutedTextStyle}" Text="ID" />
                                 <TextBlock Grid.Column="1" Style="{StaticResource HudMutedTextStyle}" Text="NAME" />
                                 <TextBlock Grid.Column="2" Style="{StaticResource HudMutedTextStyle}" Text="VALUE" />
-                                <TextBlock Grid.Column="3" Style="{StaticResource HudMutedTextStyle}" Text="SEV" />
+                                <TextBlock Grid.Column="3" Style="{StaticResource HudMutedTextStyle}" Text="FREQ" />
+                                <TextBlock Grid.Column="4" Style="{StaticResource HudMutedTextStyle}" Text="DIFF" />
+                                <TextBlock Grid.Column="5" Style="{StaticResource HudMutedTextStyle}" Text="SEV" />
                             </Grid>
 
                             <ScrollViewer
@@ -109,13 +113,17 @@
                                                         <ColumnDefinition Width="60" />
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="84" />
-                                                        <ColumnDefinition Width="44" />
+                                                        <ColumnDefinition Width="64" />
+                                                        <ColumnDefinition Width="64" />
+                                                        <ColumnDefinition Width="34" />
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Style="{StaticResource HudMutedTextStyle}" Text="{Binding CanId}" />
                                                     <TextBlock Grid.Column="1" Foreground="{StaticResource PrimaryTextBrush}" Style="{StaticResource HudBodyTextStyle}" Text="{Binding Name}" />
                                                     <TextBlock Grid.Column="2" Foreground="{StaticResource AccentCyanBrush}" Style="{StaticResource HudBodyTextStyle}" Text="{Binding Value}" />
-                                                    <Border Grid.Column="3" Width="20" Height="20" HorizontalAlignment="Center" BorderBrush="#304046" BorderThickness="1">
-                                                        <Rectangle Width="8" Height="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock Grid.Column="3" Foreground="#B0C4CC" Style="{StaticResource HudBodyTextStyle}" FontSize="9" Text="{Binding FrequencyText}" />
+                                                    <TextBlock Grid.Column="4" Foreground="#B0C4CC" Style="{StaticResource HudBodyTextStyle}" FontSize="9" Text="{Binding TimeDiffText}" />
+                                                    <Border Grid.Column="5" Width="16" Height="16" HorizontalAlignment="Center" BorderBrush="#304046" BorderThickness="1">
+                                                        <Rectangle Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                             <Rectangle.Style>
                                                                 <Style TargetType="Rectangle">
                                                                     <Setter Property="Fill" Value="#3B6B76" />
@@ -162,8 +170,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Foreground="{StaticResource AccentCyanBrush}" FontFamily="Consolas" FontSize="11" Text="TRACE 01: SOC_CELL_AVG [84.2%]" />
-                        <TextBlock Grid.Column="1" Foreground="#84C7FF" FontFamily="Consolas" FontSize="11" Text="TRACE 02: CELL_MAX_V [3.94V]" />
+                        <TextBlock Foreground="{StaticResource AccentCyanBrush}" FontFamily="Consolas" FontSize="11" Text="{Binding Trace1Text}" />
+                        <TextBlock Grid.Column="1" Foreground="#84C7FF" FontFamily="Consolas" FontSize="11" Text="{Binding Trace2Text}" />
                     </Grid>
 
                     <Border Grid.Row="2" Style="{StaticResource HudHeroCardStyle}">
@@ -227,17 +235,17 @@
 
                                 <Button Grid.Column="3" Margin="0,0,8,0" Style="{StaticResource HudNavButtonStyle}" MinWidth="44" Content="+" />
                                 <Button Grid.Column="4" Margin="0,0,8,0" Style="{StaticResource HudNavButtonStyle}" MinWidth="44" Content="-" />
-                                <Button Grid.Column="5" Margin="0,0,8,0" Style="{StaticResource HudNavButtonStyle}" MinWidth="60" Content="PAUSE" />
-                                <Button Grid.Column="6" Style="{StaticResource HudNavButtonStyle}" MinWidth="60" Content="RESET" />
+                                <Button Grid.Column="5" Margin="0,0,8,0" Style="{StaticResource HudNavButtonStyle}" MinWidth="60" Command="{Binding FreezeStreamCommand}" Content="PAUSE" />
+                                <Button Grid.Column="6" Style="{StaticResource HudNavButtonStyle}" MinWidth="60" Command="{Binding ResumeStreamCommand}" Content="RESET" />
                             </Grid>
                         </Grid>
                     </Border>
 
                     <UniformGrid Grid.Row="3" Columns="4" Margin="0,14,0,0">
-                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Content="IMPORT LOG" />
-                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Content="EXPORT SIGNALS" />
-                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Background="#55151414" BorderBrush="#88FF716C" Content="FREEZE STREAM" />
-                        <Button Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Background="#3300FFFF" BorderBrush="#CC00FFFF" Content="RESUME STREAM" />
+                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Command="{Binding ImportLogCommand}" Content="IMPORT LOG" />
+                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Command="{Binding ExportSignalsCommand}" Content="EXPORT SIGNALS" />
+                        <Button Margin="0,0,10,0" Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Background="#55151414" BorderBrush="#88FF716C" Command="{Binding FreezeStreamCommand}" Content="FREEZE STREAM" />
+                        <Button Style="{StaticResource HudActionButtonStyle}" MinWidth="0" Background="#3300FFFF" BorderBrush="#CC00FFFF" Command="{Binding ResumeStreamCommand}" Content="RESUME STREAM" />
                     </UniformGrid>
                 </Grid>
 

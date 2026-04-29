@@ -1,8 +1,6 @@
-using System.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using CANvision.Native.Scene;
 using CANvision.Native.Services;
 using CANvision.Native.ViewModels;
@@ -16,7 +14,6 @@ public partial class MainWindow : Window
     private readonly MainWindowViewModel viewModel;
     private readonly AppLogger logger;
     private GarageScene? garageSceneControl;
-    private bool introStarted;
     private bool isUsing3DScene;
 
     public MainWindow(MainWindowViewModel viewModel, AppLogger logger)
@@ -26,9 +23,18 @@ public partial class MainWindow : Window
         this.logger = logger;
         DataContext = viewModel;
         Loaded += OnLoaded;
-        InitializeGarageSceneIfEnabled();
-        viewModel.PropertyChanged += ViewModelOnPropertyChanged;
         Closed += OnClosed;
+        viewModel.PropertyChanged += ViewModelOnPropertyChanged;
+        InitializeGarageSceneIfEnabled();
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        InterfaceLayer.Opacity = 1.0;
+        logger.Info($"CurrentSection: {viewModel.CurrentSection?.GetType().Name ?? "null"}");
+        logger.Info($"IsSectionVisible: {viewModel.IsSectionVisible}");
+        logger.Info($"CurrentSectionKey: {viewModel.CurrentSectionKey}");
+        garageSceneControl?.BeginIntro();
     }
 
     private void ViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -37,99 +43,6 @@ public partial class MainWindow : Window
         {
             garageSceneControl?.SetSection(viewModel.CurrentSectionKey);
         }
-
-        if (e.PropertyName == nameof(MainWindowViewModel.IsSectionVisible) ||
-            e.PropertyName == nameof(MainWindowViewModel.CurrentSectionKey))
-        {
-            UpdateViewState(e.PropertyName == nameof(MainWindowViewModel.IsSectionVisible));
-        }
-    }
-
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        if (introStarted)
-        {
-            return;
-        }
-
-        introStarted = true;
-        StartWindowIntro();
-
-        if (isUsing3DScene)
-        {
-            garageSceneControl?.BeginIntro();
-        }
-
-        UpdateViewState(animateSectionEntry: false);
-    }
-
-    private void StartWindowIntro()
-    {
-        AnimateOpacity(BackgroundImageLayer, 0.0, 1.0, TimeSpan.Zero, TimeSpan.FromMilliseconds(500));
-    }
-
-    private void OnGarageSceneIntroCompleted(object? sender, EventArgs e)
-    {
-        UpdateViewState(animateSectionEntry: false);
-    }
-
-    private void AnimateSectionContent()
-    {
-        if (SectionContentHost is null || SectionContentTranslate is null)
-        {
-            return;
-        }
-
-        var opacityAnimation = new DoubleAnimation
-        {
-            From = 0.0,
-            To = 1.0,
-            Duration = new Duration(TimeSpan.FromMilliseconds(340)),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut },
-            FillBehavior = FillBehavior.Stop,
-        };
-        var translateAnimation = new DoubleAnimation
-        {
-            From = 32,
-            To = 0,
-            Duration = new Duration(TimeSpan.FromMilliseconds(380)),
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
-            FillBehavior = FillBehavior.Stop,
-        };
-
-        SectionContentHost.Opacity = 1.0;
-        SectionContentTranslate.Y = 0.0;
-        SectionContentHost.BeginAnimation(OpacityProperty, opacityAnimation);
-        SectionContentTranslate.BeginAnimation(TranslateTransform.YProperty, translateAnimation);
-    }
-
-    private static void AnimateOpacity(UIElement element, double from, double to, TimeSpan beginTime, TimeSpan duration)
-    {
-        var animation = new DoubleAnimation
-        {
-            From = from,
-            To = to,
-            BeginTime = beginTime,
-            Duration = new Duration(duration),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut },
-            FillBehavior = FillBehavior.HoldEnd,
-        };
-
-        element.BeginAnimation(OpacityProperty, animation);
-    }
-
-    private void OnClosed(object? sender, EventArgs e)
-    {
-        Loaded -= OnLoaded;
-        if (garageSceneControl is not null)
-        {
-            garageSceneControl.IntroCompleted -= OnGarageSceneIntroCompleted;
-            garageSceneControl.Dispose();
-            GarageSceneHost.Content = null;
-        }
-
-        viewModel.PropertyChanged -= ViewModelOnPropertyChanged;
-        Closed -= OnClosed;
     }
 
     private void InitializeGarageSceneIfEnabled()
@@ -147,13 +60,15 @@ public partial class MainWindow : Window
 
         try
         {
-            garageSceneControl = new GarageScene();
+            garageSceneControl = new GarageScene
+            {
+                IsHitTestVisible = false,
+            };
             garageSceneControl.Initialize(logger);
-            garageSceneControl.IntroCompleted += OnGarageSceneIntroCompleted;
-            garageSceneControl.SetRenderingActive(!viewModel.IsSectionVisible);
+            garageSceneControl.SetRenderingActive(true);
             garageSceneControl.SetSection(viewModel.CurrentSectionKey);
             GarageSceneHost.Content = garageSceneControl;
-            logger.Info("3D showroom enabled.");
+            logger.Info("3D showroom enabled behind interface layer.");
         }
         catch (Exception exception)
         {
@@ -164,23 +79,16 @@ public partial class MainWindow : Window
         }
     }
 
-    private void UpdateViewState(bool animateSectionEntry)
+    private void OnClosed(object? sender, EventArgs e)
     {
-        var isSectionVisible = viewModel.IsSectionVisible;
-        InterfaceLayer.IsHitTestVisible = isSectionVisible;
-        garageSceneControl?.SetRenderingActive(!isSectionVisible);
-
-        if (!isSectionVisible)
+        if (garageSceneControl is not null)
         {
-            return;
+            garageSceneControl.Dispose();
+            GarageSceneHost.Content = null;
         }
 
-        InterfaceLayer.Opacity = 1.0;
-        AnimateSectionContent();
-        if (animateSectionEntry)
-        {
-            AnimateOpacity(InterfaceLayer, 0.0, 1.0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260));
-        }
-
+        viewModel.PropertyChanged -= ViewModelOnPropertyChanged;
+        Loaded -= OnLoaded;
+        Closed -= OnClosed;
     }
 }

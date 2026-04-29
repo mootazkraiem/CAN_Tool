@@ -15,10 +15,10 @@ namespace CANvision.Native.Scene;
 
 public partial class GarageScene : UserControl, IDisposable
 {
-    private static readonly Point3D FinalCameraPosition = new(1.36, 1.66, 10.65);
-    private static readonly Vector3D FinalCameraLookDirection = new(-0.86, -0.2, -10.34);
-    private static readonly Point3D IntroCameraPosition = new(1.7, 1.48, 12.65);
-    private static readonly Vector3D IntroCameraLookDirection = new(-1.08, -0.05, -12.2);
+    private static readonly Point3D FinalCameraPosition = new(0.0, 1.78, 10.2);
+    private static readonly Vector3D FinalCameraLookDirection = new(0.0, -0.18, -10.2);
+    private static readonly Point3D IntroCameraPosition = new(0.0, 1.62, 12.1);
+    private static readonly Vector3D IntroCameraLookDirection = new(0.0, -0.04, -12.1);
     private static readonly Point3D OrbitTarget = new(
         FinalCameraPosition.X + FinalCameraLookDirection.X,
         FinalCameraPosition.Y + FinalCameraLookDirection.Y,
@@ -143,27 +143,22 @@ public partial class GarageScene : UserControl, IDisposable
         Viewport.Items.Clear();
         Viewport.Items.Add(new AmbientLight3D
         {
-            Color = Color.FromRgb(58, 64, 72),
+            Color = Color.FromRgb(214, 216, 220),
         });
         Viewport.Items.Add(new DirectionalLight3D
         {
-            Color = Color.FromRgb(248, 244, 236),
-            Direction = new Vector3D(-1.25, -1.05, -0.52),
+            Color = Color.FromRgb(248, 246, 242),
+            Direction = new Vector3D(-0.45, -1.0, -0.62),
         });
         Viewport.Items.Add(new DirectionalLight3D
         {
-            Color = Color.FromRgb(228, 234, 240),
-            Direction = new Vector3D(1.08, -0.58, -0.78),
+            Color = Color.FromRgb(236, 236, 234),
+            Direction = new Vector3D(0.52, -0.72, -0.58),
         });
         Viewport.Items.Add(new DirectionalLight3D
         {
-            Color = Color.FromRgb(214, 222, 232),
-            Direction = new Vector3D(-0.18, -0.28, 1.16),
-        });
-        Viewport.Items.Add(new DirectionalLight3D
-        {
-            Color = Color.FromRgb(200, 206, 214),
-            Direction = new Vector3D(0.26, -0.94, 0.36),
+            Color = Color.FromRgb(170, 196, 204),
+            Direction = new Vector3D(0.18, -0.42, 1.05),
         });
         Viewport.Items.Add(CarNodeGroup);
     }
@@ -191,7 +186,7 @@ public partial class GarageScene : UserControl, IDisposable
         ApplyOrbitCamera();
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         if (isRenderingActive)
         {
@@ -200,7 +195,7 @@ public partial class GarageScene : UserControl, IDisposable
 
         if (!hasLoadedModel && carRenderer is not null)
         {
-            hasLoadedModel = carRenderer.Load();
+            hasLoadedModel = await carRenderer.LoadAsync();
             carRenderer.SetIntroProgress(introStarted ? GetCarProgress() : 0.0);
         }
     }

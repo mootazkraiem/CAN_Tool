@@ -20,10 +20,11 @@ public sealed class CarRenderer
         PostProcessSteps.GenerateSmoothNormals |
         PostProcessSteps.ImproveCacheLocality |
         PostProcessSteps.CalculateTangentSpace;
-    private static readonly Vector3 HeroCarOffset = new(0.52f, -1.34f, 0.0f);
+    private static readonly Vector3 HeroCarOffset = new(0.0f, 0.16f, 0.0f);
 
     private readonly SceneNodeGroupModel3D host;
     private readonly AppLogger logger;
+    private readonly System.Windows.Threading.Dispatcher dispatcher;
     private readonly AxisAngleRotation3D heroRotation = new(new System.Windows.Media.Media3D.Vector3D(0, 1, 0), -32);
     private readonly AxisAngleRotation3D idleRotation = new(new System.Windows.Media.Media3D.Vector3D(0, 1, 0), 0);
     private readonly Transform3DGroup transformGroup = new Transform3DGroup();
@@ -31,6 +32,7 @@ public sealed class CarRenderer
     private readonly TranslateTransform3D centerTransform = new();
     private readonly TranslateTransform3D heroOffsetTransform = new();
     private readonly TranslateTransform3D introTransform = new();
+    private readonly TranslateTransform3D idleFloatTransform = new();
     private readonly string[] glassMaterialNames = ["GlassMtl", "GlassMtl.002", "GlassRed.002", "GlassAmber.002", "Mirror"];
     private bool modelLoaded;
     private double introProgress;
@@ -40,16 +42,18 @@ public sealed class CarRenderer
     {
         this.host = host;
         this.logger = logger;
+        dispatcher = Application.Current.Dispatcher;
         transformGroup.Children.Add(scaleTransform);
         transformGroup.Children.Add(centerTransform);
         transformGroup.Children.Add(new RotateTransform3D(heroRotation));
         transformGroup.Children.Add(new RotateTransform3D(idleRotation));
         transformGroup.Children.Add(heroOffsetTransform);
         transformGroup.Children.Add(introTransform);
+        transformGroup.Children.Add(idleFloatTransform);
         host.Transform = transformGroup;
     }
 
-    public bool Load()
+    public async Task<bool> LoadAsync()
     {
         var gltfPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
@@ -78,12 +82,15 @@ public sealed class CarRenderer
             logger.Error($"Texture directory not found at {texturesPath}.");
         }
 
-        if (TryLoadWithHelix(gltfPath))
+        // Load and attach scene on background thread, UI work via Dispatcher
+        var helixSuccess = await TryLoadWithHelixAsync(gltfPath);
+        if (helixSuccess)
         {
             return true;
         }
 
-        if (TryLoadWithAssimpFallback(gltfPath))
+        var assimpSuccess = await TryLoadWithAssimpFallbackAsync(gltfPath);
+        if (assimpSuccess)
         {
             return true;
         }
@@ -104,6 +111,7 @@ public sealed class CarRenderer
         var deltaSeconds = (now - lastTickUtc).TotalSeconds;
         lastTickUtc = now;
         idleRotation.Angle = (idleRotation.Angle + (deltaSeconds * 5.6)) % 360.0;
+        idleFloatTransform.OffsetY = Math.Sin(now.TimeOfDay.TotalSeconds * 0.55) * 0.028;
     }
 
     public void SetIntroProgress(double progress)
@@ -122,24 +130,36 @@ public sealed class CarRenderer
         if (introProgress < 0.999)
         {
             idleRotation.Angle = 0.0;
+            idleFloatTransform.OffsetY = 0.0;
         }
     }
 
-    private bool TryLoadWithHelix(string modelPath)
+    private async Task<bool> TryLoadWithHelixAsync(string modelPath)
     {
         try
         {
-            using var importer = new Importer();
-            var scene = importer.Load(modelPath);
-            if (scene?.Root is null)
+            var loadResult = await Task.Run(() =>
             {
-                throw new InvalidOperationException("HelixToolkit returned an empty scene.");
-            }
+                using var importer = new Importer();
+                var scene = importer.Load(modelPath);
+                if (scene?.Root is null)
+                {
+                    throw new InvalidOperationException("HelixToolkit returned an empty scene.");
+                }
 
-            var bounds = CalculateBounds(modelPath);
-            ApplyPlacement(bounds);
-            host.AddNode(scene.Root);
-            host.Visibility = Visibility.Visible;
+                var bounds = CalculateBounds(modelPath);
+                return new LoadResult(scene.Root, bounds);
+            }).ConfigureAwait(false);
+
+            // UI attachment on UI thread
+            await dispatcher.InvokeAsync(() =>
+            {
+                ApplyPlacement(loadResult.Bounds);
+                TuneImportedMaterials(loadResult.Root);
+                host.AddNode(loadResult.Root);
+                host.Visibility = Visibility.Visible;
+            });
+
             modelLoaded = true;
             logger.Info($"HelixToolkit loaded car model successfully from {modelPath}.");
             return true;
@@ -151,40 +171,41 @@ public sealed class CarRenderer
         }
     }
 
-    private bool TryLoadWithAssimpFallback(string modelPath)
+    private async Task<bool> TryLoadWithAssimpFallbackAsync(string modelPath)
     {
         try
         {
-            using var assimpContext = new AssimpContext();
-            var assimpScene = assimpContext.ImportFile(modelPath, ImportSteps);
-            if (assimpScene is null || assimpScene.MeshCount == 0)
+            var cachedObjPath = await Task.Run(() =>
             {
-                throw new InvalidOperationException("AssimpNet returned an empty scene.");
-            }
+                using var assimpContext = new AssimpContext();
+                var assimpScene = assimpContext.ImportFile(modelPath, ImportSteps);
+                if (assimpScene is null || assimpScene.MeshCount == 0)
+                {
+                    throw new InvalidOperationException("AssimpNet returned an empty scene.");
+                }
 
-            logger.Info("AssimpNet successfully imported the GLTF scene. Exporting OBJ cache fallback.");
+                logger.Info("AssimpNet successfully imported the GLTF scene. Exporting OBJ cache fallback.");
 
-            var cacheDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "cache");
-            Directory.CreateDirectory(cacheDirectory);
-            var cachedObjPath = Path.Combine(cacheDirectory, "toyota_supra_mk4_a80.obj");
-            var texturesPath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "assets",
-                "toyota_supra_mk4_a80",
-                "textures");
+                var cacheDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "cache");
+                Directory.CreateDirectory(cacheDirectory);
+                var cachedObjPath = Path.Combine(cacheDirectory, "toyota_supra_mk4_a80.obj");
+                var texturesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "toyota_supra_mk4_a80", "textures");
 
-            if (!File.Exists(cachedObjPath))
-            {
-                assimpContext.ExportFile(assimpScene, cachedObjPath, "obj");
-                CopyTextureCache(texturesPath, Path.Combine(cacheDirectory, "textures"));
-                logger.Info($"OBJ cache generated at {cachedObjPath}.");
-            }
-            else
-            {
-                logger.Info($"Reusing cached OBJ at {cachedObjPath}.");
-            }
+                if (!File.Exists(cachedObjPath))
+                {
+                    assimpContext.ExportFile(assimpScene, cachedObjPath, "obj");
+                    CopyTextureCache(texturesPath, Path.Combine(cacheDirectory, "textures"));
+                    logger.Info($"OBJ cache generated at {cachedObjPath}.");
+                }
+                else
+                {
+                    logger.Info($"Reusing cached OBJ at {cachedObjPath}.");
+                }
 
-            return TryLoadWithHelix(cachedObjPath);
+                return cachedObjPath;
+            }).ConfigureAwait(false);
+
+            return await TryLoadWithHelixAsync(cachedObjPath);
         }
         catch (Exception exception)
         {
@@ -557,5 +578,18 @@ public sealed class CarRenderer
         public double MaxY { get; }
 
         public double MaxZ { get; }
+    }
+
+    private sealed class LoadResult
+    {
+        public LoadResult(SceneNode root, ModelBounds bounds)
+        {
+            Root = root;
+            Bounds = bounds;
+        }
+
+        public SceneNode Root { get; }
+
+        public ModelBounds Bounds { get; }
     }
 }
