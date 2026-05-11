@@ -1,8 +1,74 @@
-/bin
-/obj
-/logs
-/.vs
-/.tmp_py
-/can_env
-/can_env_313
-/can_env_313_broken
+﻿# =========================
+# PYTHON CACHE
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# =========================
+# VIRTUAL ENVS
+# =========================
+.venv/
+venv/
+env/
+
+# =========================
+# C# BUILD FILES
+# =========================
+bin/
+obj/
+
+# =========================
+# GENERATED ML OUTPUTS
+# =========================
+backend/ml/outputs/
+
+# =========================
+# GENERATED VALIDATION FILES
+# =========================
+backend/ml/validation_reports/
+
+# =========================
+# GENERATED PLOTS
+# =========================
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# =========================
+# GENERATED CSV EXPORTS
+# =========================
+backend/ml/**/*.csv
+
+# KEEP TRAINING / RAW DATASETS
+!backend/ml/data/**/*.csv
+!backend/ml/assets/**/*.csv
+!backend/ml/training/**/*.csv
+
+# =========================
+# GENERATED JSON REPORTS
+# =========================
+backend/ml/**/*.json
+backend/ml/**/*.jsonl
+
+# KEEP IMPORTANT CONFIG JSON
+!backend/ml/config/**/*.json
+
+# =========================
+# DOTNET / NUGET HOME
+# =========================
+.dotnet_cli_home/
+
+# =========================
+# VS CODE / IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# SYSTEM FILES
+# =========================
+.DS_Store
+Thumbs.db
